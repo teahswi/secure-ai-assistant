@@ -1,0 +1,9 @@
+fastapi==0.115.*
+uvicorn[standard]==0.30.*
+pyjwt==2.*
+python-multipart
+pypdf
+numpy
+requests
+pytest
+httpx

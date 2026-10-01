@@ -1,0 +1,21 @@
+2026-10-01
+
+- Corrected the backend startup command in README.md; `uvicorn main:app --port 8000` was accidentally joined to `ollama serve`.
+- Updated the backend and frontend setup examples to use PowerShell activation syntax.
+- Confirmed the backend test suite passes: 4 tests passed.
+- Startup note: run backend commands from `backend` and frontend commands from `frontend`; both directories contain their own project files.
+- Reinstalled frontend dependencies after npm's optional Rollup package was blocked by Windows Application Control.
+- Pinned frontend Vite from 5.x to 4.5.5 so the existing React/Vite architecture builds without the blocked Rollup 4 native module.
+- Confirmed the frontend production build passes with Vite 4.5.5.
+
+2026-10-02
+
+- Sign-up: POST /register creates a no-permission account (clearance 0, no roles); an admin assigns role + clearance. New `admin` demo user and Admin tab (users, roles/permissions, documents).
+- Admin document upload (.txt/.md/.docx/.pdf) now triggers chunk -> label -> embed -> store, atomically (ingest.py). Added re-embed-all for when the embedder changes.
+- RAG: users now name the documents (@mention / picker) instead of embedding-search over everything. Authorization (SQL) runs first; the selection can only narrow it. Ranking happens inside the selected documents.
+- New backend/config.json (+ config.py): lighter default chat model qwen3:1.7b, embed_backend=hash by default (switch to ollama + qwen3-embedding later), top_k, queue limits, etc. Env vars override.
+- Chat is queued: POST /chat -> 202 job; single worker; GET /jobs/{id}; UI shows queued position / retrieving / generating states; sessions + history persist across refresh.
+- Audit: /audit now has filters + pagination for admins/auditors (others see only their own); Audit tab with Verify chain. Audit writes are serialized with a lock (worker + API threads).
+- Write access: added an explicit `write` action (model-proposed, executor-enforced, confirmation when tainted). bob (contractor) has no write permission. A "*" project is now honoured ONLY for audit/admin, so a stray write:* row can no longer grant anything. Added tests.
+- UI error fix (building on the 2026-10-01 notes): vite pinned to exactly 4.5.5 (lockfile synced); fetch wrapper no longer crashes with "Unexpected token" on empty/non-JSON proxy errors (backend down) and shows a readable message; 401 returns to login; session survives refresh; error boundary instead of a blank page; stale dist/ rebuilt.
+- Tests: 21 backend tests pass; UI flows verified against a running backend with a simulated slow Ollama.

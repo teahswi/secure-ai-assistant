@@ -1,0 +1,15 @@
+{
+  "chat_model": "qwen3:1.7b",
+  "chat_think": false,
+  "embed_backend": "hash",
+  "embed_model": "qwen3-embedding",
+  "ollama_url": "http://localhost:11434",
+  "mock_llm": false,
+  "top_k": 4,
+  "chunk_size": 500,
+  "history_messages": 6,
+  "taint_level": 2,
+  "llm_timeout_s": 300,
+  "max_queue_per_user": 5,
+  "max_upload_mb": 5
+}
