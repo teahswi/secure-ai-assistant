@@ -72,6 +72,8 @@ def run(jid):
     reply = llm.chat(hist + [{"role": "user", "content": f"{docs}\n\nQuestion: {msg}"}])
     m = re.search(r"ACTION:\s*(\{.*?\})", reply, re.S)
     text = re.sub(r"ACTION:\s*\{.*?\}", "", reply, flags=re.S).strip() or "(no answer)"
+    if text == "(no answer)":
+        text = llm.extractive_answer(f"{docs}\n\nQuestion: {msg}")
     mx = max(r["level"] for r in top)
     tainted = any(r["level"] >= cfg["taint_level"] or r["flag"] for r in top)
     sources = [{"id": r["id"], "doc_id": r["doc_id"], "title": r["title"], "project": r["project"], "level": r["level"], "flagged": bool(r["flag"]), "flag_reason": r["flag_reason"]} for r in top]

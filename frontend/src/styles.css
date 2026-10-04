@@ -37,6 +37,18 @@ button.small { padding:3px 9px; font-size:12px; }
 .sess { text-align:left; background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:8px 10px; width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .sess.on { border-color:var(--accent2); background:var(--panel2); }
 .convo { flex:1; min-width:0; display:flex; flex-direction:column; }
+.library { flex:0 0 auto; margin-bottom:10px; max-height:230px; overflow:auto; }
+.library-head { display:flex; justify-content:space-between; gap:10px; align-items:flex-start; margin-bottom:8px; }
+.library-projects { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:8px; }
+.project-card { border:1px solid var(--line); border-radius:8px; padding:8px; background:var(--panel2); }
+.project-title { display:flex; justify-content:space-between; gap:8px; margin-bottom:6px; }
+.project-title .mute { font-size:11px; }
+.project-docs { display:flex; flex-direction:column; gap:4px; }
+.doc-card { display:flex; gap:7px; align-items:flex-start; text-align:left; background:transparent; border:1px solid transparent; padding:5px 6px; font-size:12px; }
+.doc-card:hover:not(:disabled), .doc-card.selected { background:#302d68; border-color:var(--accent2); }
+.doc-card small { display:block; color:var(--mute); font-size:11px; margin-top:1px; }
+.doc-check { width:16px; color:var(--accent2); font-weight:700; }
+.library-empty { color:var(--mute); padding:8px 0 2px; }
 .msgs { flex:1; min-height:0; overflow:auto; display:flex; flex-direction:column; gap:10px; padding:4px 2px 10px; }
 .msg { max-width:78%; padding:9px 12px; border-radius:12px; border:1px solid var(--line); white-space:pre-wrap; word-break:break-word; }
 .msg.user { align-self:flex-end; background:#2a2760; border-color:#3d3a8c; }
@@ -72,3 +84,4 @@ th { color:var(--mute); font-weight:500; font-size:12px; position:sticky; top:0;
 .ev-bad { color:var(--bad); } .ev-warn { color:var(--warn); } .ev-ok { color:var(--ok); }
 .pager { display:flex; gap:8px; align-items:center; margin-top:8px; }
 .rolebox { display:flex; flex-wrap:wrap; gap:8px; } .rolebox label { display:flex; gap:4px; align-items:center; font-size:13px; }
+@media (max-width: 720px) { .app { padding:8px; } .chat { flex-direction:column; } .side { width:100%; max-height:120px; } .library { max-height:260px; } .msg { max-width:92%; } }

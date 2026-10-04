@@ -19,7 +19,7 @@ function Markdown({ text }) {
 }
 
 export default function Chat({ token, me, onErr, refreshMe }) {
-  const [docs, setDocs] = useState([]), [sel, setSel] = useState([]);
+  const [docs, setDocs] = useState([]), [projects, setProjects] = useState([]), [sel, setSel] = useState([]);
   const [sessions, setSessions] = useState([]), [sid, setSid] = useState(null), [data, setData] = useState({ messages: [] });
   const [jobs, setJobs] = useState({});                 // jobId -> {sid,status,stage,position}
   const [text, setText] = useState(""), [pick, setPick] = useState(false), [err, setErr] = useState(""), [sending, setSending] = useState(false);
@@ -28,7 +28,10 @@ export default function Chat({ token, me, onErr, refreshMe }) {
   const fail = e => { onErr(e); setErr(e.message); };
 
   const loadDocs = useCallback(async () => {
-    try { const d = await call("/documents", { token }); setDocs(d); setSel(s => s.filter(i => d.some(x => x.id === i))); } catch (e) { fail(e); }
+    try {
+      const [d, p] = await Promise.all([call("/documents", { token }), call("/projects", { token })]);
+      setDocs(d); setProjects(p); setSel(s => s.filter(i => d.some(x => x.id === i)));
+    } catch (e) { fail(e); }
   }, [token]); // eslint-disable-line
   const loadSessions = useCallback(async () => { try { setSessions(await call("/sessions", { token })); } catch (e) { fail(e); } }, [token]); // eslint-disable-line
   const openSession = useCallback(async id => {
@@ -107,6 +110,22 @@ export default function Chat({ token, me, onErr, refreshMe }) {
       </div>
 
       <div className="convo">
+        <div className="library card">
+          <div className="library-head">
+            <div><b>Knowledge base</b><div className="mute">Only documents you are authorized to read are shown.</div></div>
+            <span className="badge">{docs.length} document{docs.length === 1 ? "" : "s"} · {projects.length} project{projects.length === 1 ? "" : "s"}</span>
+          </div>
+          {projects.length ? <div className="library-projects">{projects.map(project => (
+            <div className="project-card" key={project.name}>
+              <div className="project-title"><b>{project.name}</b><span className="mute">{project.document_count} document{project.document_count === 1 ? "" : "s"} · L{project.levels.join(", L")}</span></div>
+              <div className="project-docs">{project.documents.map(doc => (
+                <button key={doc.id} className={"doc-card" + (sel.includes(doc.id) ? " selected" : "")} onClick={() => toggle(doc.id)} title={doc.flag_reason || doc.title}>
+                  <span className="doc-check">{sel.includes(doc.id) ? "✓" : "+"}</span><span>{doc.title}<small>{project.name}/L{doc.level}{doc.flagged ? " · ⚠ flagged" : ""}</small></span>
+                </button>
+              ))}</div>
+            </div>
+          ))}</div> : <div className="library-empty">{me.pending ? "Your account is awaiting project permissions." : "No readable documents are assigned to this account yet."}</div>}
+        </div>
         <div className="msgs">
           {!data.messages.length && <div className="mute" style={{ margin: "auto", textAlign: "center", maxWidth: 420 }}>
             Pick the documents you need (type <b>@</b> or use <b>+ Documents</b>), then ask a question. The assistant only searches what you select, and only what you're cleared to see.

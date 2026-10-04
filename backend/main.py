@@ -76,6 +76,20 @@ def documents(u=Depends(current)):
     """Only documents this user may read are ever listed (titles of other documents are not disclosed)."""
     return [{**dict(d), "flagged": bool(d["flag"])} for d in S.allowed_docs(u["id"])]
 
+@app.get("/projects")
+def projects(u=Depends(current)):
+    """Return only projects that contain documents the current user may read."""
+    docs = [dict(d) | {"flagged": bool(d["flag"])} for d in S.allowed_docs(u["id"])]
+    grouped = {}
+    for doc in docs:
+        project = grouped.setdefault(doc["project"], {"name": doc["project"], "documents": [], "levels": set()})
+        project["documents"].append(doc)
+        project["levels"].add(doc["level"])
+    return [
+        {**project, "document_count": len(project["documents"]), "levels": sorted(project["levels"])}
+        for project in sorted(grouped.values(), key=lambda item: item["name"].lower())
+    ]
+
 # ---------------- chat (queued) ----------------
 @app.post("/chat", status_code=202)
 def chat(b: Chat, u=Depends(current)):

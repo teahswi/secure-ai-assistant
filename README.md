@@ -145,6 +145,7 @@ frontend/src/    App, Auth, Chat, Admin, Audit, api.js, styles.css
 |---|---|
 | `POST /register`, `POST /login`, `GET /me` | sign-up (no permissions), JWT, current permissions |
 | `GET /documents` | documents *this user* may read (the picker's source) |
+| `GET /projects` | projects and documents *this user* may read (the chat knowledge-base view) |
 | `POST /chat` `{message, session_id?, doc_ids[]}` | enqueue → `202 {job_id, session_id}` |
 | `GET /jobs/{id}` | `queued` (with `position`) / `running` (`stage`) / `done` (result) / `error` |
 | `GET /sessions`, `GET /sessions/{id}` | conversation list / history (+ jobs still pending) |

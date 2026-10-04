@@ -56,6 +56,13 @@ def test_chunk_filter_and_doc_selection_never_widens():
     assert any(r["project"] == "Y" for r in S.allowed_chunks(CAROL))
     assert [d["title"] for d in S.allowed_docs(BOB)] and all(d["project"] == "X" and d["level"] <= 1 for d in S.allowed_docs(BOB))
 
+def test_projects_endpoint_only_exposes_readable_documents(client):
+    hb, hc = login(client, "bob", "bob123"), login(client, "carol", "carol123")
+    bob = client.get("/projects", headers=hb)
+    carol = client.get("/projects", headers=hc)
+    assert bob.status_code == 200 and [(p["name"], p["document_count"]) for p in bob.json()] == [("X", 3)]
+    assert carol.status_code == 200 and [(p["name"], p["document_count"]) for p in carol.json()] == [("Y", 1)]
+
 def test_audit_chain():
     S.audit(1, "t", {}); S.audit(2, "t", {}); assert S.verify_chain()[0]
     x("update audit_log set event='forged' where id=1"); assert not S.verify_chain()[0]
