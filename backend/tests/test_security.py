@@ -122,6 +122,7 @@ def test_rag_answers_from_selected_doc_only(client):
     h = login(client, "alice", "alice123")
     j = ask(client, h, "What is the budget usage?", ["Project X Status Report"])
     assert j["status"] == "done" and {s["title"] for s in j["result"]["sources"]} == {"Project X Status Report"}
+    assert "62 percent" in j["result"]["reply"]
     # ranking: with several chunks in one doc, the chunk that answers the question is retrieved first-class
     import rag; from config import cfg
     text = ". ".join(f"Filler sentence number {i} about unrelated logistics and weather" for i in range(40)) + ". The antenna array is serviced every ninety days."

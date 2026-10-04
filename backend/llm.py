@@ -29,7 +29,18 @@ def embed(t):
 def _mock(content):
     """Simulates a FULLY MANIPULATED model: obeys any ACTION line found in documents."""
     docs = re.findall(r"<DOC[^>]*>(.*?)</DOC>", content, re.S)
-    out = "Summary: " + " | ".join(d.strip().split(". ")[0] for d in docs)[:600]
+    question = content.rsplit("Question:", 1)[-1]
+    stop = {"about", "after", "and", "are", "from", "have", "into", "that", "the", "this", "what", "with", "your"}
+    terms = {w for w in re.findall(r"\w+", question.lower()) if len(w) > 2 and w not in stop}
+    sentences = []
+    for doc in docs:
+        sentences.extend(s.strip() for s in re.split(r"(?<=[.!?])\s+", doc.strip()) if s.strip())
+    ranked = sorted(
+        enumerate(sentences),
+        key=lambda item: (-len(terms.intersection(re.findall(r"\w+", item[1].lower()))), item[0]),
+    )
+    selected = [sentence for _, sentence in ranked[:3] if sentence]
+    out = "Answer: " + " | ".join(selected or ["I could not find an answer in the selected documents."])[:600]
     m = re.search(r"ACTION:\s*(\{.*?\})", content)
     return out + ("\nACTION: " + m.group(1) if m else "")
 
